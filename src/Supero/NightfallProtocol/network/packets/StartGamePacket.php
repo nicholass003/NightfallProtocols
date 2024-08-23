@@ -3,12 +3,12 @@
 namespace Supero\NightfallProtocol\network\packets;
 
 use pocketmine\math\Vector3;
-use pocketmine\nbt\tag\CompoundTag;
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 use pocketmine\network\mcpe\protocol\StartGamePacket as PM_Packet;
 use pocketmine\network\mcpe\protocol\types\BlockPaletteEntry;
 use pocketmine\network\mcpe\protocol\types\CacheableNbt;
 use pocketmine\network\mcpe\protocol\types\ItemTypeEntry;
+use pocketmine\network\mcpe\protocol\types\LevelSettings;
 use pocketmine\network\mcpe\protocol\types\NetworkPermissions;
 use pocketmine\network\mcpe\protocol\types\PlayerMovementSettings;
 use Ramsey\Uuid\UuidInterface;
@@ -30,6 +30,7 @@ class StartGamePacket extends PM_Packet
     public CacheableNbt $playerActorProperties; //same as SyncActorPropertyPacket content
 
     public CustomLevelSettings $customLevelSettings;
+    public LevelSettings $levelSettings;
 
     public string $levelId = ""; //base64 string, usually the same as world folder name in vanilla
     public string $worldName;
@@ -109,6 +110,7 @@ class StartGamePacket extends PM_Packet
         $result->yaw = $yaw;
         $result->playerActorProperties = $playerActorProperties;
         $result->customLevelSettings = $customLevelSettings;
+        $result->levelSettings = CustomLevelSettings::convert($customLevelSettings);
         $result->levelId = $levelId;
         $result->worldName = $worldName;
         $result->premiumWorldTemplateId = $premiumWorldTemplateId;
@@ -140,6 +142,7 @@ class StartGamePacket extends PM_Packet
         $this->yaw = $in->getLFloat();
 
         $this->customLevelSettings = CustomLevelSettings::read($in);
+        $this->levelSettings = CustomLevelSettings::convert($this->customLevelSettings);
 
         $this->levelId = $in->getString();
         $this->worldName = $in->getString();

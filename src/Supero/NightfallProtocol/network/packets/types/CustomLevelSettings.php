@@ -13,6 +13,7 @@ use pocketmine\network\mcpe\protocol\types\EducationUriResource;
 use pocketmine\network\mcpe\protocol\types\Experiments;
 use pocketmine\network\mcpe\protocol\types\GameRule;
 use pocketmine\network\mcpe\protocol\types\GeneratorType;
+use pocketmine\network\mcpe\protocol\types\LevelSettings;
 use pocketmine\network\mcpe\protocol\types\MultiplayerGameVisibility;
 use pocketmine\network\mcpe\protocol\types\PlayerPermissions;
 use pocketmine\network\mcpe\protocol\types\SpawnSettings;
@@ -89,6 +90,62 @@ class CustomLevelSettings
         $result->internalRead($in);
         return $result;
     }
+
+    public static function convert(self $settings) : LevelSettings{
+        $result = new LevelSettings();
+        $result->seed = $settings->seed;
+        $result->spawnSettings = $settings->spawnSettings;
+        $result->generator = $settings->generator;
+        $result->worldGamemode = $settings->worldGamemode;
+        $result->hardcore = $settings->hardcore;
+        $result->difficulty = $settings->difficulty;
+        $result->spawnPosition = $settings->spawnPosition;
+        $result->hasAchievementsDisabled = $settings->hasAchievementsDisabled;
+        $result->editorWorldType = $settings->editorWorldType;
+        $result->createdInEditorMode = $settings->createdInEditorMode;
+        $result->exportedFromEditorMode = $settings->exportedFromEditorMode;
+        $result->time = $settings->time;
+        $result->eduEditionOffer = $settings->eduEditionOffer;
+        $result->hasEduFeaturesEnabled = $settings->hasEduFeaturesEnabled;
+        $result->eduProductUUID = $settings->eduProductUUID;
+        $result->rainLevel = $settings->rainLevel;
+        $result->lightningLevel = $settings->lightningLevel;
+        $result->hasConfirmedPlatformLockedContent = $settings->hasConfirmedPlatformLockedContent;
+        $result->isMultiplayerGame = $settings->isMultiplayerGame;
+        $result->hasLANBroadcast = $settings->hasLANBroadcast;
+        $result->xboxLiveBroadcastMode = $settings->xboxLiveBroadcastMode;
+        $result->platformBroadcastMode = $settings->platformBroadcastMode;
+        $result->commandsEnabled = $settings->commandsEnabled;
+        $result->isTexturePacksRequired = $settings->isTexturePacksRequired;
+        $result->gameRules = $settings->gameRules;
+        $result->experiments = $settings->experiments;
+        $result->hasBonusChestEnabled = $settings->hasBonusChestEnabled;
+        $result->hasStartWithMapEnabled = $settings->hasStartWithMapEnabled;
+        $result->defaultPlayerPermission = $settings->defaultPlayerPermission;
+        $result->serverChunkTickRadius = $settings->serverChunkTickRadius;
+        $result->hasLockedBehaviorPack = $settings->hasLockedBehaviorPack;
+        $result->hasLockedResourcePack = $settings->hasLockedResourcePack;
+        $result->isFromLockedWorldTemplate = $settings->isFromLockedWorldTemplate;
+        $result->useMsaGamertagsOnly = $settings->useMsaGamertagsOnly;
+        $result->isFromWorldTemplate = $settings->isFromWorldTemplate;
+        $result->isWorldTemplateOptionLocked = $settings->isWorldTemplateOptionLocked;
+        $result->onlySpawnV1Villagers = $settings->onlySpawnV1Villagers;
+        $result->disablePersona = $settings->disablePersona;
+        $result->disableCustomSkins = $settings->disableCustomSkins;
+        $result->muteEmoteAnnouncements = $settings->muteEmoteAnnouncements;
+        $result->vanillaVersion = $settings->vanillaVersion;
+        $result->limitedWorldWidth = $settings->limitedWorldWidth;
+        $result->limitedWorldLength = $settings->limitedWorldLength;
+        $result->isNewNether = $settings->isNewNether;
+        $result->eduSharedUriResource = $settings->eduSharedUriResource;
+        $result->experimentalGameplayOverride = $settings->experimentalGameplayOverride;
+        $result->chatRestrictionLevel = $settings->chatRestrictionLevel;
+        $result->disablePlayerInteractions = $settings->disablePlayerInteractions;
+        $result->serverIdentifier = $settings->serverIdentifier;
+        $result->worldIdentifier = $settings->worldIdentifier;
+        $result->scenarioIdentifier = $settings->scenarioIdentifier;
+        return $result;
+    }    
 
     /**
      * @throws BinaryDataException
