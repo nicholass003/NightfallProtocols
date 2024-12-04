@@ -6,9 +6,13 @@ namespace Supero\NightfallProtocol\network\packets;
 
 use pocketmine\network\mcpe\protocol\ResourcePacksInfoPacket as PM_Packet;
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
+use Ramsey\Uuid\Uuid;
+use Ramsey\Uuid\UuidInterface;
 use Supero\NightfallProtocol\network\CustomProtocolInfo;
 use Supero\NightfallProtocol\network\packets\types\resourcepacks\CustomBehaviourPackInfoEntry;
 use Supero\NightfallProtocol\network\packets\types\resourcepacks\CustomResourcePackInfoEntry;
+use Supero\NightfallProtocol\utils\ReflectionUtils;
+
 use function count;
 
 class ResourcePacksInfoPacket extends PM_Packet
@@ -21,6 +25,8 @@ class ResourcePacksInfoPacket extends PM_Packet
 	public bool $hasAddons = false;
 	public bool $hasScripts = false; //if true, causes disconnect for any platform that doesn't support scripts yet
 	public bool $forceServerPacks = false;
+	public UuidInterface $worldTemplateId;
+	public string $worldTemplateVersion;
 	/**
 	 * @var string[]
 	 * @phpstan-var array<string, string>
@@ -40,6 +46,8 @@ class ResourcePacksInfoPacket extends PM_Packet
 		bool $mustAccept,
 		bool $hasAddons,
 		bool $hasScripts,
+		UuidInterface $worldTemplateId,
+		string $worldTemplateVersion,
 		bool $forceServerPacks,
 		array $cdnUrls,
 	) : self{
@@ -49,6 +57,8 @@ class ResourcePacksInfoPacket extends PM_Packet
 		$result->mustAccept = $mustAccept;
 		$result->hasAddons = $hasAddons;
 		$result->hasScripts = $hasScripts;
+		$result->worldTemplateId = $worldTemplateId;
+		$result->worldTemplateVersion = $worldTemplateVersion;
 		$result->forceServerPacks = $forceServerPacks;
 		$result->cdnUrls = $cdnUrls;
 		return $result;
@@ -67,13 +77,17 @@ class ResourcePacksInfoPacket extends PM_Packet
 				$this->behaviorPackEntries[] = CustomBehaviourPackInfoEntry::read($in);
 			}
 		}
+		if ($in->getProtocol() >= CustomProtocolInfo::PROTOCOL_1_21_50) {
+			$this->worldTemplateId = $in->getUUID();
+			$this->worldTemplateVersion = $in->getString();
+		}
 
 		$resourcePackCount = $in->getLShort();
 		while($resourcePackCount-- > 0){
 			$this->resourcePackEntries[] = CustomResourcePackInfoEntry::read($in);
 		}
 
-		if($in->getProtocol() >= CustomProtocolInfo::PROTOCOL_1_21_0 && $in->getProtocol() < CustomProtocolInfo::PROTOCOL_1_21_40){
+		if($in->getProtocol() < CustomProtocolInfo::PROTOCOL_1_21_40){
 			$this->cdnUrls = [];
 			for($i = 0, $count = $in->getUnsignedVarInt(); $i < $count; $i++){
 				$packId = $in->getString();
@@ -96,11 +110,15 @@ class ResourcePacksInfoPacket extends PM_Packet
 				$entry->write($out);
 			}
 		}
+		if ($out->getProtocol() >= CustomProtocolInfo::PROTOCOL_1_21_50) {
+			$out->putUUID($this->worldTemplateId);
+			$out->putString($this->worldTemplateVersion);
+		}
 		$out->putLShort(count($this->resourcePackEntries));
 		foreach($this->resourcePackEntries as $entry){
 			$entry->write($out);
 		}
-		if($out->getProtocol() >= CustomProtocolInfo::PROTOCOL_1_21_0 && $out->getProtocol() < CustomProtocolInfo::PROTOCOL_1_21_40){
+		if($out->getProtocol() < CustomProtocolInfo::PROTOCOL_1_21_40){
 			$out->putUnsignedVarInt(count($this->cdnUrls));
 			foreach($this->cdnUrls as $packId => $cdnUrl){
 				$out->putString($packId);
@@ -117,6 +135,8 @@ class ResourcePacksInfoPacket extends PM_Packet
 			$packet->mustAccept,
 			$packet->hasAddons ?? false,
 			$packet->hasScripts,
+			ReflectionUtils::getProperty($packet::class, $packet, "worldTemplateId"),
+			ReflectionUtils::getProperty($packet::class, $packet, "worldTemplateVersion"),
 			false,
 			[]
 		];

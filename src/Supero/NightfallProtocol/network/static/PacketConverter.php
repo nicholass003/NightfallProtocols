@@ -26,6 +26,8 @@ use Supero\NightfallProtocol\network\CustomNetworkSession;
 use Supero\NightfallProtocol\network\CustomProtocolInfo;
 use Supero\NightfallProtocol\network\packets\types\resourcepacks\CustomResourcePackInfoEntry;
 use Supero\NightfallProtocol\network\static\convert\CustomTypeConverter;
+use Supero\NightfallProtocol\utils\ReflectionUtils;
+
 use function dechex;
 use function in_array;
 use function method_exists;
@@ -214,6 +216,8 @@ class PacketConverter
 					$packet->mustAccept,
 					$packet->hasAddons,
 					$packet->hasScripts,
+					ReflectionUtils::getProperty($packet::class, $packet, "worldTemplateId"),
+					ReflectionUtils::getProperty($packet::class, $packet, "worldTemplateVersion"),
 					false,
 					[]
 				);
